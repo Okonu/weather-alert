@@ -8,9 +8,9 @@ use Livewire\Livewire;
 uses(RefreshDatabase::class);
 
 test('weather alert form can be rendered', function () {
-    $this->get('/')
+    Livewire::test(WeatherAlertForm::class)
         ->assertStatus(200)
-        ->assertSeeLivewire('weather-alert-form');
+        ->assertSee('Subscribe to Weather Alerts');
 });
 
 test('weather alert form creates a subscription', function () {

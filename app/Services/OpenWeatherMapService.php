@@ -13,9 +13,9 @@ class OpenWeatherMapService implements WeatherServiceInterface
 
     private int $cacheDuration = 30;
 
-    public function __construct()
+    public function __construct(?string $apiKey = null)
     {
-        $this->apiKey = config('services.openweathermap.key');
+        $this->apiKey = $apiKey ?? config('services.openweathermap.key', 'test_api_key');
     }
 
     public function getCurrentWeather(string $city): array

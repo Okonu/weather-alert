@@ -16,12 +16,14 @@ test('it generates correct mail for single city', function () {
         ]
     ];
 
-    $notification = new WeatherAlertNotification($cities);
+    $notification = new WeatherAlertNotification($cities, null, 'http://test.com');
     $mail = $notification->toMail('test@example.com');
 
     expect($mail->subject)->toBe('Weather Alert for 1 City')
-        ->and($mail->viewData['introLines'][1])->toContain('London')
-        ->and($mail->viewData['introLines'][2])->toContain('High Precipitation: 10mm');
+        ->and($mail->introLines)->toBeArray()
+        ->and($mail->introLines[1])->toContain('London')
+        ->and($mail->introLines[2])->toContain('High Precipitation: 10mm')
+        ->and($mail->actionUrl)->toBe('http://test.com');
 });
 
 test('it generates correct mail for multiple cities', function () {
@@ -48,14 +50,16 @@ test('it generates correct mail for multiple cities', function () {
         ]
     ];
 
-    $notification = new WeatherAlertNotification($cities);
+    $notification = new WeatherAlertNotification($cities, null, 'http://test.com');
     $mail = $notification->toMail('test@example.com');
 
     expect($mail->subject)->toBe('Weather Alert for 2 Cities')
-        ->and($mail->viewData['introLines'][1])->toContain('London')
-        ->and($mail->viewData['introLines'][2])->toContain('High Precipitation: 10mm')
-        ->and($mail->viewData['introLines'][4])->toContain('Paris')
-        ->and($mail->viewData['introLines'][5])->toContain('High UV Index: 8');
+        ->and($mail->introLines)->toBeArray()
+        ->and($mail->introLines[1])->toContain('London')
+        ->and($mail->introLines[2])->toContain('High Precipitation: 10mm')
+        ->and($mail->introLines[4])->toContain('Paris')
+        ->and($mail->introLines[5])->toContain('High UV Index: 8')
+        ->and($mail->actionUrl)->toBe('http://test.com');
 });
 
 test('it includes multiple alerts for same city', function () {
@@ -80,8 +84,9 @@ test('it includes multiple alerts for same city', function () {
     $notification = new WeatherAlertNotification($cities);
     $mail = $notification->toMail('test@example.com');
 
-    expect($mail->viewData['introLines'][2])->toContain('High Precipitation: 10mm')
-        ->and($mail->viewData['introLines'][3])->toContain('High UV Index: 8');
+    expect($mail->introLines)->toBeArray()
+        ->and($mail->introLines[2])->toContain('High Precipitation: 10mm')
+        ->and($mail->introLines[3])->toContain('High UV Index: 8');
 });
 
 test('get city and get alerts provide backward compatibility', function () {

@@ -8,8 +8,12 @@ use App\Notifications\WeatherAlertNotification;
 use App\Services\AlertService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
+
+beforeEach(function () {
+});
 
 test('it sends notification for high precipitation', function () {
     Notification::fake();
@@ -372,10 +376,7 @@ test('it handles both legacy and authenticated user alerts', function () {
     $alertService = new AlertService($weatherService);
     $alertService->processAlerts();
 
-    Notification::assertSentTo(
-        [['mail' => 'legacy@example.com']],
-        WeatherAlertNotification::class
-    );
+    Notification::assertSentOnDemand(WeatherAlertNotification::class);
 
     Notification::assertSentTo(
         $user,

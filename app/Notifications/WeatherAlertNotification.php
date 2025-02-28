@@ -12,10 +12,21 @@ class WeatherAlertNotification extends Notification implements ShouldQueue
     use Queueable;
 
     private array $cities;
+    private string $baseUrl;
 
-    public function __construct(array $cities)
+    public function __construct($cityOrCities, array $alerts = null, string $baseUrl = 'http://localhost')
     {
-        $this->cities = $cities;
+        if (is_string($cityOrCities) && is_array($alerts)) {
+            $this->cities = [
+                [
+                    'name' => $cityOrCities,
+                    'alerts' => $alerts
+                ]
+            ];
+        } else {
+            $this->cities = $cityOrCities;
+        }
+        $this->baseUrl = $baseUrl;
     }
 
     public function via($notifiable): array
@@ -51,7 +62,7 @@ class WeatherAlertNotification extends Notification implements ShouldQueue
 
         return $mailMessage
             ->line('Stay safe!')
-            ->action('View Forecast', url('/'))
+            ->action('View Forecast', $this->baseUrl)
             ->line('Thank you for using our weather alert service!');
     }
 

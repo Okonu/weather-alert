@@ -76,10 +76,15 @@ test('user can toggle alert types', function () {
         ->call('selectCity', $city->id)
         ->set('precipitation_enabled', true)
         ->set('uv_enabled', false)
+        ->set('precipitation_threshold', 5.0)
+        ->set('uv_threshold', 6.0)
         ->call('subscribeToCity');
 
-    expect($user->cities()->where('name', 'London')->first()->pivot->precipitation_enabled)->toBeTrue()
-        ->and($user->cities()->where('name', 'London')->first()->pivot->uv_enabled)->toBeFalse();
+    $userCity = $user->fresh()->cities()->where('name', 'London')->first();
+
+    expect($userCity)->not()->toBeNull()
+        ->and((bool)$userCity->pivot->precipitation_enabled)->toBeTrue()
+        ->and((bool)$userCity->pivot->uv_enabled)->toBeFalse();
 });
 
 test('user can subscribe to multiple cities', function () {
@@ -117,13 +122,18 @@ test('user can update threshold settings', function () {
 
     Livewire::actingAs($user)
         ->test(CitiesManager::class)
-        ->call('mount')
         ->set('precipitation_threshold', 10.0)
         ->set('uv_threshold', 9.0)
+        ->set('precipitation_enabled', true)
+        ->set('uv_enabled', false)
         ->call('updateThresholds', $city->id);
 
-    expect($user->cities()->where('name', 'London')->first()->pivot->precipitation_threshold)->toBe(10.0)
-        ->and($user->cities()->where('name', 'London')->first()->pivot->uv_threshold)->toBe(9.0);
+    $updatedCity = $user->fresh()->cities()->where('name', 'London')->first();
+
+    expect($updatedCity->pivot->precipitation_threshold)->toBe(10.0)
+        ->and($updatedCity->pivot->uv_threshold)->toBe(9.0)
+        ->and((bool)$updatedCity->pivot->precipitation_enabled)->toBeTrue()
+        ->and((bool)$updatedCity->pivot->uv_enabled)->toBeFalse();
 });
 
 test('validation rules are enforced', function () {

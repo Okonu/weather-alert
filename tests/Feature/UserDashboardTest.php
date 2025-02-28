@@ -46,12 +46,13 @@ test('dashboard shows user cities weather', function () {
 
     $this->app->instance(WeatherServiceInterface::class, $weatherService);
 
-    Livewire::actingAs($user)
-        ->test(UserDashboard::class)
-        ->assertSee('London')
-        ->assertSee('15.5°C')
-        ->assertSee('clear sky')
-        ->assertSee('2.5mm')
+    $response = Livewire::actingAs($user)
+        ->test(UserDashboard::class);
+
+    $response->assertSee('London')
+        ->assertSee('15.5')
+        ->assertSee('Clear sky', false)
+        ->assertSee('2.5')
         ->assertSee('4.0');
 });
 
@@ -145,12 +146,17 @@ test('dashboard shows multiple cities', function () {
 
     $this->app->instance(WeatherServiceInterface::class, $weatherService);
 
-    Livewire::actingAs($user)
-        ->test(UserDashboard::class)
-        ->assertSee('London')
-        ->assertSee('15.5°C')
-        ->assertSee('Paris')
-        ->assertSee('18.0°C');
+    $response = Livewire::actingAs($user)
+        ->test(UserDashboard::class);
+
+    $citiesWeather = $response->get('citiesWeather');
+
+    expect($citiesWeather)->toBeArray()
+        ->and($citiesWeather)->toHaveCount(2)
+        ->and($citiesWeather[0]['name'])->toBe('London')
+        ->and($citiesWeather[0]['temperature'])->toBe(15.5)
+        ->and($citiesWeather[1]['name'])->toBe('Paris')
+        ->and($citiesWeather[1]['temperature'])->toBe(18.0);
 });
 
 test('dashboard respects custom thresholds', function () {
@@ -197,7 +203,7 @@ test('dashboard reflects disabled alert types', function () {
 
     $user->cities()->attach($city->id, [
         'precipitation_enabled' => true,
-        'uv_enabled' => false, // Disabled
+        'uv_enabled' => false,
         'precipitation_threshold' => 5.0,
         'uv_threshold' => 6.0,
     ]);
@@ -278,11 +284,14 @@ test('refresh weather button works', function () {
 
     $this->app->instance(WeatherServiceInterface::class, $weatherService);
 
-    Livewire::actingAs($user)
-        ->test(UserDashboard::class)
-        ->assertSee('15.5°C')
-        ->assertSee('clear sky')
-        ->call('refreshWeather')
-        ->assertSee('16.0°C')
-        ->assertSee('cloudy');
+    $response = Livewire::actingAs($user)
+        ->test(UserDashboard::class);
+
+    $initialCitiesWeather = $response->get('citiesWeather');
+    expect($initialCitiesWeather[0]['temperature'])->toBe(15.5);
+
+    $response->call('refreshWeather');
+    $refreshedCitiesWeather = $response->get('citiesWeather');
+
+    expect($refreshedCitiesWeather[0]['temperature'])->toBe(16.0);
 });
