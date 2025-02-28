@@ -38,7 +38,8 @@ class WeatherAlertForm extends Component
         ]);
 
         session()->flash('message', 'Weather alert subscription created successfully!');
-        $this->emit('alert-created');
+
+        $this->dispatch('alert-created');
 
         $this->reset(['email', 'city']);
     }
