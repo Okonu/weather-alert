@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('weather_alerts', function (Blueprint $table) {
             $table->id();
+            $table->string('email');
+            $table->string('city');
+            $table->boolean('precipitation_enabled')->default(true);
+            $table->boolean('uv_enabled')->default(true);
+            $table->float('precipitation_threshold')->default(5.0);
+            $table->float('uv_threshold')->default(6.0);
             $table->timestamps();
         });
     }
