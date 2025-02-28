@@ -46,4 +46,14 @@ class WeatherAlertNotification extends Notification implements ShouldQueue
             ->action('View Forecast', url('/'))
             ->line('Thank you for using our weather alert service!');
     }
+
+    public function getAlerts(): array
+    {
+        return $this->alerts;
+    }
+
+    public function getCity(): string
+    {
+        return $this->city;
+    }
 }
