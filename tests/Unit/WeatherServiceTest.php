@@ -4,12 +4,20 @@ use App\Contracts\WeatherServiceInterface;
 use App\Services\OpenWeatherMapService;
 use Illuminate\Support\Facades\Http;
 
-test('it can fetch current weather', function () {
-    $this->instance(
-        WeatherServiceInterface::class,
-        new OpenWeatherMapService()
-    );
+beforeEach(function () {
+    $cacheMock = Mockery::mock('alias:Illuminate\Support\Facades\Cache');
+    $cacheMock->shouldReceive('remember')
+        ->zeroOrMoreTimes()
+        ->andReturnUsing(function ($key, $ttl, $callback) {
+            return $callback();
+        });
 
+    $service = new OpenWeatherMapService('test_api_key');
+
+    app()->bind(WeatherServiceInterface::class, fn() => $service);
+});
+
+test('it can fetch current weather', function () {
     Http::fake([
         'api.openweathermap.org/data/2.5/weather*' => Http::response([
             'coord' => ['lat' => 51.51, 'lon' => -0.13],
@@ -28,7 +36,7 @@ test('it can fetch current weather', function () {
 });
 
 test('it returns precipitation amount', function () {
-    $service = Mockery::mock(OpenWeatherMapService::class);
+    $service = Mockery::mock(OpenWeatherMapService::class, ['test_api_key']);
     $service->makePartial();
     $service->shouldReceive('getCurrentWeather')
         ->with('London')
@@ -42,7 +50,7 @@ test('it returns precipitation amount', function () {
 });
 
 test('it returns zero precipitation when no rain data', function () {
-    $service = Mockery::mock(OpenWeatherMapService::class);
+    $service = Mockery::mock(OpenWeatherMapService::class, ['test_api_key']);
     $service->makePartial();
     $service->shouldReceive('getCurrentWeather')
         ->with('London')
@@ -53,4 +61,8 @@ test('it returns zero precipitation when no rain data', function () {
     $precipitation = $service->getPrecipitation('London');
 
     expect($precipitation)->toEqual(0.0);
+});
+
+afterEach(function () {
+    Mockery::close();
 });

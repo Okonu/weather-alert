@@ -6,18 +6,26 @@ A Laravel-based application that notifies users about potentially harmful weathe
 
 Weather Alert Service monitors high precipitation levels and harmful UV index values for cities that users subscribe to. The service uses OpenWeatherMap API to fetch real-time weather data and sends email notifications when conditions exceed user-defined thresholds.
 
-## Features (Tier 1)
+## Features
 
+### Tier 1
 - **Real-time Weather Monitoring**: View current weather conditions for any city
 - **Email Alerts**: Receive notifications when precipitation or UV levels become dangerous
-- **Custom Thresholds**: Default thresholds set for precipitation (5mm) and UV index (6)
-- **Dashboard**: Built with Livewire
-- **Setup**: Docker-based environment using Laravel Sail
+- **Basic Alert Settings**: Configure which types of alerts you receive
+- **Docker-based Setup**: One-button deployment with Laravel Sail
+
+### Tier 2
+- **User Authentication**: Register and manage your account with Laravel Jetstream
+- **Multiple Cities**: Subscribe to alerts for multiple cities of interest
+- **Custom Thresholds**: Set different alert thresholds for each city
+- **Personalized Dashboard**: View current conditions for all your subscribed cities
+- **Advanced Alert Configuration**: Enable/disable specific alert types per city
 
 ## Technical Stack
 
 - **Laravel**: PHP framework for backend
 - **Livewire**: For interactive UI components
+- **Jetstream**: User authentication and profile management
 - **OpenWeatherMap API**: Weather data source
 - **Laravel Notifications**: Email alert system
 - **Laravel Sail**: Docker environment
@@ -53,14 +61,24 @@ Weather Alert Service monitors high precipitation levels and harmful UV index va
    ```bash
    ./vendor/bin/sail artisan migrate
    ```
+5. Seed the database with sample cities (optional)
+   ```bash
+   ./vendor/bin/sail artisan db:seed
+   ```
 
-5. Visit http://localhost in your browser
+6. Visit http://localhost in your browser
 
 ## Usage
 
-1. **View Weather**: Enter a city name in the dashboard to see current weather conditions
-2. **Subscribe to Alerts**: Fill out the form with your email and city
-3. **Receive Alerts**: Automated hourly checks will notify you when conditions exceed thresholds
+### Anonymous Users
+- Visit the homepage to see the service overview and register/login options
+
+### Authenticated Users
+1. **Register/Login**: Create an account or login to access your dashboard
+2. **Add Cities**: Navigate to "Manage Cities" to subscribe to alerts for cities of interest
+3. **Set Custom Thresholds**: Configure precipitation and UV index thresholds for each city
+4. **View Dashboard**: See current weather conditions for all your subscribed cities
+5. **Receive Alerts**: Get email notifications when conditions in your cities exceed your thresholds
 
 ## Testing
 
@@ -71,8 +89,9 @@ Run the test suite with:
 
 The tests cover:
 - Weather data retrieval from API
-- Alert threshold evaluation
+- Alert threshold evaluation and customization
 - Email notification sending
+- User authentication and city management
 - Livewire component functionality
 
 ## Scheduled Tasks
@@ -82,10 +101,3 @@ The system automatically checks weather conditions hourly. To run the scheduler:
 ```bash
 ./vendor/bin/sail artisan schedule:work
 ```
-
-## Future Enhancements (Planned)
-
-- User authentication and profiles
-- Notification for multiple cities per user
-- Custom threshold settings
-- Additional notification channels
